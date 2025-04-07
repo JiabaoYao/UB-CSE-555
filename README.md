@@ -60,8 +60,8 @@
 
 ### 2.4 Text-Embedding
 
-`text-embeddings` folder contains embeddings files and the script to obtain it.
+`text-embeddings` folder contains embeddings files and the script to obtain it.  
 `bert_text_embedding.ipynb` saves the logic of converting text gloss to embeddings. Bert
 large model is used instead of CLIP since Bert is more suitbale for our project which needs word embedding. CLIP in the other hand is more suitbale for phrase and sentence embeddings.
-`gloss_embeddings.
+`gloss_embeddings.  
 `gloss_embeddings.npz`saves both gloss and their embeddings. This could be useful for debugging and visualization.`text_embeddings.npy` saves embeddings ONLY. It should be the one used for model building and training though the exact usage may vary depending on the design process.
