@@ -1,25 +1,27 @@
-# 1 Data download
+# **Multimodal 3D Sign Language Translation**
+
+## 1 Data download
 > ../data_download  
 > `../raw_videos`: original videos (not covert to mp4)  
 > `../raw_videos_mp4`: convert all videos to mp4 format
 > `../videos`: covert youtube video name to simple video name  
 > `../script`: data download and process scripts
 
-## 1.1 Data process
+### 1.1 Data process
 1. Run `video_downloader.py` to download videos from youtube based on `WLASL_v0.3.json`, download log will be generated to check
 
 2. Run `preprocess.py` to covert raw videos to a standand video format: videoId.mp4
 
 3. Run `find_missing.py` to figure out the missing data, a missing.txt will be generated.
 
-# 2 Dataset preprocess for training
-## 2.1 data source and scripts
+## 2 Dataset preprocess for training
+### 2.1 data source and scripts
 > ../videos/  
 > ../extract_features_scripts/  
 
-**Due to git repo limitztion, source files are saved at google drive:`https://drive.google.com/drive/folders/18hM71LUlha7Km0lqN5W33RX98gAsLr0I?usp=sharing`.**
+**Due to git repo limitzation, source files are saved at google drive:`https://drive.google.com/drive/folders/18hM71LUlha7Km0lqN5W33RX98gAsLr0I?usp=sharing`.**
 
-## 2.2 Preprocess steps
+### 2.2 Preprocess steps
 1. Run `data_match_process.ipynb`to generate `matched_samples.txt`
 
 2. Run `extract_features_script/convert_video_to_matrix.py` to handle series of videos and generate their json and npy files, seperately save into `/dataset/json` and `/dataset/matrix` folders.
@@ -30,7 +32,7 @@
 
 5. After finishing generating all matrix and json files, combine them via `data_match_process.ipynb` to generate `dataset_all_padding.npz`.  This is the input include all gloss and 3d keypoints matrix of all vaild videos.
 
-## 2.3 Dataset and loader
+### 2.3 Dataset and loader
 `dataset_loader.py` contains the integrated Dataset ([N, 2]) definition and a loader function. Use the loader as model input.
 
 1. How to use it?
