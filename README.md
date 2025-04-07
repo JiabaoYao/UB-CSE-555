@@ -19,7 +19,7 @@
 > ../videos/  
 > ../extract_features_scripts/  
 
-**Due to git repo limitzation, source files are saved at google drive:`https://drive.google.com/drive/folders/18hM71LUlha7Km0lqN5W33RX98gAsLr0I?usp=sharing`.**
+**Due to git repo size limit, source files are saved at google drive:`https://drive.google.com/drive/folders/18hM71LUlha7Km0lqN5W33RX98gAsLr0I?usp=sharing`.**
 
 ### 2.2 Preprocess steps
 1. Run `data_match_process.ipynb`to generate `matched_samples.txt`
