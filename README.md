@@ -65,9 +65,9 @@ How to use it?
 - Each video has series of frames (images).
 - One frame contains upper body (exclude face) and hands, 8 + 21 \* 2 = 50 joints. For one 3d key points, four features ([x, y, z, visibility]) are saved.
 - Dataset combines 3d key points from all videos. A series of 3d key points from the same frame are flatten into one array.
-- Among all videos, the maximum number of frames is 233. All matrix are padding with 0 to keep size = 233.
+- Among all videos, the maximum number of frames is 233. All matrices are padded with 0 to keep size = 233.
 
-3. Skeleton connection
+4. Skeleton connection
 ```
 # pose skeletons and mapping
 pose_edges = [(11, 12), (12, 14), (14, 16), (11, 13), (13, 15),
