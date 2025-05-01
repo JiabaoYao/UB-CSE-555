@@ -1,27 +1,45 @@
-import cv2
-import mediapipe as mp
-import json
 import os
+import cv2
+import json
 import numpy as np
+import mediapipe as mp
 
-# Upper-body pose indices
-upper_body_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 23, 24]
-test_flag = False  # Set to False to disable GUI
+# === Config ===
+upper_body_indices = [11, 12, 13, 14, 15, 16, 23, 24]
+hand_joint_count = 21
+test_flag = False  # Visualization toggle
 
-def matrix_process(pose_data, hand_data):
-    frame_matrix = []
+# === Keypoint processor ===
+def build_frame_data(pose_dict, hand_dict):
+    frame_data_json = {"pose": [], "hands": []}
+    frame_vector = []
 
+    # --- Pose ---
     for idx in upper_body_indices:
-        frame_matrix.extend(pose_data.get(idx, [0.0, 0.0, 0.0, 0.0]))
+        if idx in pose_dict:
+            x, y, z, v = pose_dict[idx]
+        else:
+            x = y = z = v = 0.0
+            # print(f"---> pose model fail to capture {idx}-joint")
+        frame_vector.extend([x, y, z, v])
+        frame_data_json["pose"].append({"index": idx, "x": x, "y": y, "z": z, "visibility": v})
 
-    for idx in range(21):  # Left hand
-        frame_matrix.extend(hand_data["left"].get(idx, [0.0, 0.0, 0.0, 0.0]))
+    # --- Hands ---
+    for hand_label in ["left", "right"]:
+        hand_landmarks = []
+        for i in range(hand_joint_count):
+            if i in hand_dict[hand_label]:
+                x, y, z, v = hand_dict[hand_label][i]
+            else:
+                x = y = z = v = 0.0
+                # print(f"---> hand model fail to capture {i}-joint")
+            frame_vector.extend([x, y, z, v])
+            hand_landmarks.append({"index": i, "x": x, "y": y, "z": z, "visibility": v})
+        frame_data_json["hands"].append({"label": hand_label, "landmarks": hand_landmarks})
 
-    for idx in range(21):  # Right hand
-        frame_matrix.extend(hand_data["right"].get(idx, [0.0, 0.0, 0.0, 0.0]))
+    return frame_data_json, frame_vector
 
-    return frame_matrix
-
+# === Main extraction function ===
 def extract_3d_keypoints(path, output_folder, video_name):
     video_path = os.path.join(path, video_name)
     cap = cv2.VideoCapture(video_path)
@@ -29,6 +47,7 @@ def extract_3d_keypoints(path, output_folder, video_name):
     single_video_matrix = []
 
     print("Trying to open:", video_path)
+    print("Video opened:", cap.isOpened())
 
     # Init MediaPipe
     mp_pose = mp.solutions.pose
@@ -37,8 +56,6 @@ def extract_3d_keypoints(path, output_folder, video_name):
 
     pose = mp_pose.Pose(model_complexity=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
     hands = mp_hands.Hands(model_complexity=1, max_num_hands=2, min_detection_confidence=0.5, min_tracking_confidence=0.5)
-    
-    print("Video opened:", cap.isOpened())
 
     while cap.isOpened():
         ret, frame = cap.read()
@@ -51,56 +68,36 @@ def extract_3d_keypoints(path, output_folder, video_name):
         pose_results = pose.process(image_rgb)
         hand_results = hands.process(image_rgb)
 
-        frame_data = {"pose": [], "hands": []}
         pose_dict = {}
         hands_dict = {"left": {}, "right": {}}
 
+        # --- Pose landmarks ---
         if pose_results.pose_landmarks:
             for idx in upper_body_indices:
                 lm = pose_results.pose_landmarks.landmark[idx]
-                if lm.visibility > 0.5:
-                    frame_data["pose"].append({
-                        "index": idx,
-                        "x": lm.x,
-                        "y": lm.y,
-                        "z": lm.z,
-                        "visibility": lm.visibility
-                    })
-                pose_dict[idx] = [lm.x, lm.y, lm.z, lm.visibility]
+                pose_dict[idx] = [lm.x, lm.y, max(min(lm.z, 1.0), -1.0), lm.visibility]
             if test_flag:
                 mp_drawing.draw_landmarks(frame, pose_results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
+        # --- Hands landmarks ---
         if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
             for hand_lms, handedness in zip(hand_results.multi_hand_landmarks, hand_results.multi_handedness):
-                label = handedness.classification[0].label.lower()  # "left" or "right"
+                label = handedness.classification[0].label.lower()
                 for idx, lm in enumerate(hand_lms.landmark):
-                    hands_dict[label][idx] = [lm.x, lm.y, lm.z, 1.0]
-
-                landmarks = [{
-                    "index": idx,
-                    "x": lm.x,
-                    "y": lm.y,
-                    "z": lm.z,
-                    "visibility": 1.0
-                } for idx, lm in enumerate(hand_lms.landmark)]
-
-                frame_data["hands"].append({
-                    "label": label,
-                    "landmarks": landmarks
-                })
-
+                    hands_dict[label][idx] = [lm.x, lm.y, max(min(lm.z, 1.0), -1.0), 1.0]
                 if test_flag:
                     mp_drawing.draw_landmarks(frame, hand_lms, mp_hands.HAND_CONNECTIONS)
 
-        single_video_matrix.append(matrix_process(pose_dict, hands_dict))
+        frame_data, frame_vector = build_frame_data(pose_dict, hands_dict)
         all_data.append(frame_data)
+        single_video_matrix.append(frame_vector)
 
         if test_flag:
             cv2.imshow("Pose + Hands", frame)
             if cv2.waitKey(1) & 0xFF == 27:
                 break
 
-    # Ensure output folders exist
+    # === Save outputs ===
     os.makedirs(os.path.join(output_folder, "json"), exist_ok=True)
     os.makedirs(os.path.join(output_folder, "matrix"), exist_ok=True)
 
