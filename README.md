@@ -40,14 +40,14 @@
 6. Due to different videos have different number of frames, we add paddings to transfer all video matrices to the same structure for trainging.
 
 ### 2.3 Dataset and loader
-1. Data source:
+1. Dataset source:  
 All dataset with paddings:
 > dataset_all_padding_new.npz
 
 All dataset without paddings:  
 > dataset_all_new.npz
 
-2. Data loader
+2. Dataset loader
 `dataset_loader.py` contains the integrated Dataset ([N, 2]) definition and a loader function. Use the loader as model input.
 
 How to use it?
