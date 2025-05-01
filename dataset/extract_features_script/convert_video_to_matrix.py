@@ -1,11 +1,11 @@
 import os
 import numpy as np
 import pandas as pd
-from extract_upperbody_hands_3dkeypoints import extract_3d_keypoints
+from extract_upperbody_hands_3dkeypoints_new import extract_3d_keypoints
 import mediapipe as mp
  
-input_folder = r"D:\Courses\Pattern Recognition\WLASL\WLASL\data\videos"
-output_folder = r"D:\Courses\Pattern Recognition\WLASL\WLASL\data"
+input_folder = r"D:\Courses\Pattern Recognition\WLASL\WLASL\dataset\videos"
+output_folder = r"D:\Courses\Pattern Recognition\WLASL\WLASL\dataset"
 
 for video in os.listdir(input_folder):
     if not video.endswith(".mp4"):

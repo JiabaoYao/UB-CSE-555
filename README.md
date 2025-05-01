@@ -35,28 +35,54 @@
 
 4. Copy and paste `blender_upperbody_hands.py` to blender and render it via blender app. (remember to modify the path). Points which visibility < 0.5 are not replayed.
 
-5. After finishing generating all matrix and json files, combine them via `data_match_process.ipynb` to generate `dataset_all_padding.npz`. This is the input include all gloss and 3d keypoints matrix of all vaild videos.
+5. In order to train our model, dataset architecture is like [x,y,z,v]. Joints are not valid when `v <= 0` but we still remain them as paddings to maintain a consistent structure.
+
+6. Due to different videos have different number of frames, we add paddings to transfer all video matrices to the same structure for trainging.
 
 ### 2.3 Dataset and loader
+1. Data source:
+All dataset with paddings:
+> dataset_all_padding_new.npz
 
+All dataset without paddings:  
+> dataset_all_new.npz
+
+2. Data loader
 `dataset_loader.py` contains the integrated Dataset ([N, 2]) definition and a loader function. Use the loader as model input.
 
-1. How to use it?
+How to use it?
 
 ```
-    loader = data_loader(batch_size=10)
+    train_loader, test_loader, val_loader = data_loader(batch_size=3)
 
     for epoch in range(2):
-        for i, (gloss, keypoints) in enumerate(loader):
+        for i, (gloss, keypoints) in enumerate(train_loader):
             ...
 ```
 
-2. Dadaset structure
+3. Dataset structure
 
 - Each video has series of frames (images).
-- One frame contains upper body and hands, 15 + 21 \* 2 = 57 joints. For one 3d key points, four features ([x, y, z, visibility]) are saved.
+- One frame contains upper body (exclude face) and hands, 8 + 21 \* 2 = 50 joints. For one 3d key points, four features ([x, y, z, visibility]) are saved.
 - Dataset combines 3d key points from all videos. A series of 3d key points from the same frame are flatten into one array.
 - Among all videos, the maximum number of frames is 233. All matrix are padding with 0 to keep size = 233.
+
+3. Skeleton connection
+```
+# pose skeletons and mapping
+pose_edges = [(11, 12), (12, 14), (14, 16), (11, 13), (13, 15),
+              (12, 24), (11, 23), (24, 23)]
+pose_joints_map = {11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 16: 5, 23: 6, 24: 7}
+
+# hand skeletons
+hand_edges = [
+    (0, 1), (1, 2), (2, 3), (3, 4),       # Thumb
+    (0, 5), (5, 6), (6, 7), (7, 8),       # Index
+    (0, 9), (9,10), (10,11), (11,12),     # Middle
+    (0,13), (13,14), (14,15), (15,16),    # Ring
+    (0,17), (17,18), (18,19), (19,20)     # Pinky
+]
+```
 
 ### 2.4 Text-Embedding
 
