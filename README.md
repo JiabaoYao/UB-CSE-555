@@ -40,10 +40,20 @@
 6. Due to different videos have different number of frames, we add paddings to transfer all video matrices to the same structure for trainging.
 
 ### 2.3 Dataset and loader
+<<<<<<< HEAD
 1. Generate dataset by word num.   
 Run this script and enter word number. Before run this script, you need to ensure you folder have all video npy files. All training datasets are finally from folder `./data_preprocess/dataset`
 > python create_dataset_by_wordnum.py  
 
+=======
+1. Dataset source:  
+All dataset with paddings:
+> dataset_all_padding_new.npz
+
+All dataset without paddings:  
+> dataset_all_new.npz
+
+>>>>>>> cea5df6cda301e79667a80b69bfce859f06792f3
 2. Dataset loader
 `dataset_loader.py` contains the integrated Dataset ([N, 2]) definition and a loader function. Use the loader as model input.
 
