@@ -40,14 +40,11 @@
 6. Due to different videos have different number of frames, we add paddings to transfer all video matrices to the same structure for trainging.
 
 ### 2.3 Dataset and loader
-1. Data source:
-All dataset with paddings:
-> dataset_all_padding_new.npz
+1. Generate dataset by word num.   
+Run this script and enter word number. Before run this script, you need to ensure you folder have all video npy files. All training datasets are finally from folder `./data_preprocess/dataset`
+> python create_dataset_by_wordnum.py  
 
-All dataset without paddings:  
-> dataset_all_new.npz
-
-2. Data loader
+2. Dataset loader
 `dataset_loader.py` contains the integrated Dataset ([N, 2]) definition and a loader function. Use the loader as model input.
 
 How to use it?
@@ -65,9 +62,9 @@ How to use it?
 - Each video has series of frames (images).
 - One frame contains upper body (exclude face) and hands, 8 + 21 \* 2 = 50 joints. For one 3d key points, four features ([x, y, z, visibility]) are saved.
 - Dataset combines 3d key points from all videos. A series of 3d key points from the same frame are flatten into one array.
-- Among all videos, the maximum number of frames is 233. All matrix are padding with 0 to keep size = 233.
+- Among all videos, the maximum number of frames is 233. All matrices are padded with 0 to keep size = 233.
 
-3. Skeleton connection
+4. Skeleton connection
 ```
 # pose skeletons and mapping
 pose_edges = [(11, 12), (12, 14), (14, 16), (11, 13), (13, 15),
