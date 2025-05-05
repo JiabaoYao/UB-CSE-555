@@ -2,10 +2,9 @@ import numpy as np
 
 """
 Graph class is used to construct the graph based on our 3D key points
-The code is referenced using the original st-gcn git repo's graph.py script
-with modificaiton based on our code
+The code uses the original st-gcn git repo's graph.py script as referece with modificaiton based on our code
 Reference
-https://github.com/yysijie/st-gcn/blob/221c0e152054b8da593774c0d483e59befdb9061/net/utils/graph.py#L124
+https://github.com/yysijie/st-gcn/blob/221c0e152054b8da593774c0d483e59befdb9061/net/utils/graph.py
 """
 
 
@@ -40,11 +39,14 @@ class Graph():
             (29,38),(38,39),(39,40),(40,41),
             (29,42),(42,43),(43,44),(44,45),
             (29,46),(46,47),(47,48),(48,49)
-
         ]
 
         self.edge = self_link + neighbor_link
-        self.center = 1
+        all_nodes = set()
+        for i, j in self.edge:
+            all_nodes.add(i)
+            all_nodes.add(j)
+        print("Number of unique connected joints:", len(all_nodes))
 
     def get_hop_distance(self, num_node, edge, hop_size):
         A = np.zeros((num_node, num_node))
