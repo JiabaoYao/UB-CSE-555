@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from sklearn.preprocessing import LabelEncoder
 
+
 class SignDataset:
         def __init__(self, x, y):
             self.X = x
@@ -23,13 +24,13 @@ class SignDataset:
 
 # this function process raw open pose data to data required by st-gcn
 # however, the graph is not built in this step
-def process_data(data):
+def process_data(data, frame_num):
     # convert openpose raw data to st-gcn preferred data
     labels = []
     all_key_points = []
     for label, key_points in data:
         labels.append(label)
-        key_points = key_points.reshape(195, 50, 4) # frame-joint-channels(x,y,z,c)
+        key_points = key_points.reshape(frame_num, 50, 4) # frame-joint-channels(x,y,z,c)
         key_points = key_points.transpose(2, 0, 1) # st-gcn requires (channels, time_stamp, joints)
         all_key_points.append(key_points)
     all_key_points = np.stack(all_key_points)
