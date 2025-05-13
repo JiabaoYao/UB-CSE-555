@@ -1,4 +1,4 @@
-# **Multimodal 3D Sign Language Translation**
+# **Word-Level Sign Language Recognition**
 
 ## 1 Data download
 
